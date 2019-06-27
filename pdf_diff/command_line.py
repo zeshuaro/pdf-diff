@@ -139,7 +139,8 @@ def process_hunks(hunks, boxes):
     # text boxes in the original PDFs.
     offsets = [0, 0]
     changes = []
-    for op, oplen in hunks:
+    for op, text in hunks:
+        oplen = len(text)
         if op == 0:
             # This hunk represents a region in the two text documents that are
             # in common. So nothing to process but advance the counters.

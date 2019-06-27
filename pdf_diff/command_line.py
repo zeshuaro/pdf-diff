@@ -13,6 +13,16 @@ if sys.version_info[0] < 3:
     sys.exit("ERROR: Python version 3+ is required.")
 
 
+class Error(Exception):
+    """Base class for other exceptions"""
+    pass
+
+
+class NoDifferenceError(Error):
+    """Raised when the input value is too small"""
+    pass
+
+
 def compute_changes(pdf_fn_1, pdf_fn_2, top_margin=0, bottom_margin=100):
     # Serialize the text in the two PDFs.
     docs = [serialize_pdf(0, pdf_fn_1, top_margin, bottom_margin),
@@ -202,10 +212,9 @@ def render_changes(changes, styles, width):
 
     changes = simplify_changes(changes)
     if len(changes) == 0:
-        raise Exception("There are no text differences.")
+        raise NoDifferenceError("There are no text differences.")
 
     # Make images for all of the pages named in changes.
-
     pages = make_pages_images(changes, width)
 
     # Convert the box coordinates (PDF coordinates) into image coordinates.

@@ -475,7 +475,8 @@ def pdftopng(pdffile, pagenumber, width):
     return im.convert("RGBA")
 
 
-def main(style, files, changes, result_width, top_margin, bottom_margin, out_format, **kwargs):
+def main(files, changes=False, style='strike,underline', out_format='png', top_margin=0, bottom_margin=100,
+         result_width=900, **kwargs):
     def invalid_usage(msg):
         sys.stderr.write('ERROR: %s%s' % (msg, os.linesep))
         parser.print_usage(sys.stderr)

@@ -475,8 +475,8 @@ def pdftopng(pdffile, pagenumber, width):
     return im.convert("RGBA")
 
 
-def main(files, changes=False, style='strike,underline', out_format='png', top_margin=0, bottom_margin=100,
-         result_width=900, **kwargs):
+def main(files, out_file='output.png', changes=False, style='strike,underline', out_format='png', top_margin=0,
+         bottom_margin=100, result_width=900, **kwargs):
     def invalid_usage(msg):
         sys.stderr.write('ERROR: %s%s' % (msg, os.linesep))
         parser.print_usage(sys.stderr)
@@ -507,7 +507,7 @@ def main(files, changes=False, style='strike,underline', out_format='png', top_m
     changes = compute_changes(files[0], files[1], top_margin=float(top_margin),
                               bottom_margin=float(bottom_margin))
     img = render_changes(changes, style, result_width)
-    img.save(sys.stdout.buffer, out_format.upper())
+    img.save(out_file, out_format.upper())
 
 
 if __name__ == "__main__":
@@ -519,6 +519,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('files', nargs='*',  # Use '*' to allow --changes with zero files
                         help='calculate differences between the two named files')
+    parser.add_argument('-o', '--out_file', default='output.png', help='output file name')
     parser.add_argument('-c', '--changes', action='store_true', default=False,
                         help='read change description from standard input, ignoring files')
     parser.add_argument('-s', '--style', metavar='box|strike|underline,box|stroke|underline',

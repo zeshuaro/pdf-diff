@@ -1,1 +1,1 @@
-name = "pdf_diff"
+from .command_line import main

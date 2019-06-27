@@ -134,6 +134,7 @@ def perform_diff(doc1text, doc2text):
     return dmp.diff_main(doc1text, doc2text)
 
 
+
 def process_hunks(hunks, boxes):
     # Process each diff hunk one by one and look at their corresponding
     # text boxes in the original PDFs.
@@ -501,7 +502,7 @@ def main(style, files, changes, result_width, top_margin, bottom_margin, out_for
 
     # Ensure enough file are specified
     if len(files) != 2:
-        invalid_usage('Insufficient number of files to compare please supply exactly 2.')
+        invalid_usage('Insufficient number of files to compare; please supply exactly 2.')
 
     changes = compute_changes(files[0], files[1], top_margin=float(top_margin),
                               bottom_margin=float(bottom_margin))

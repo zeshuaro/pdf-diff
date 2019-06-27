@@ -477,7 +477,41 @@ def pdftopng(pdffile, pagenumber, width):
     return im.convert("RGBA")
 
 
-def main():
+def main(style, files, changes, result_width, top_margin, bottom_margin, out_format, **kwargs):
+    def invalid_usage(msg):
+        sys.stderr.write('ERROR: %s%s' % (msg, os.linesep))
+        parser.print_usage(sys.stderr)
+        sys.exit(1)
+
+    # Validate style
+    style = style.split(',')
+    if len(style) != 2:
+        invalid_usage('Exactly two style values must be specified, if --style is used.')
+    for i in [0, 1]:
+        if style[i] != 'box' and style[i] != 'strike' and style[i] != 'underline':
+            invalid_usage('--style values must be box, strike or underline, not "%s".' % (style[i]))
+
+    # Ensure one of files or --changes are specified
+    if len(files) == 0 and not changes:
+        invalid_usage('Please specify files to compare, or use --changes option.')
+
+    if changes:
+        # to just do the rendering part
+        img = render_changes(json.load(sys.stdin), style, result_width)
+        img.save(sys.stdout.buffer, out_format.upper())
+        sys.exit(0)
+
+    # Ensure enough file are specified
+    if len(files) != 2:
+        invalid_usage('Insufficient number of files to compare; please supply exactly 2.')
+
+    changes = compute_changes(files[0], files[1], top_margin=float(top_margin),
+                              bottom_margin=float(bottom_margin))
+    img = render_changes(changes, style, result_width)
+    img.save(sys.stdout.buffer, out_format.upper())
+
+
+if __name__ == "__main__":
     import argparse
 
     description = ('Calculates the differences between two specified files in PDF format '
@@ -491,7 +525,7 @@ def main():
     parser.add_argument('-s', '--style', metavar='box|strike|underline,box|stroke|underline',
                         default='strike,underline',
                         help='how to mark the differences in the two files (default: strike, underline)')
-    parser.add_argument('-f', '--format', choices=['png', 'gif', 'jpeg', 'ppm', 'tiff'], default='png',
+    parser.add_argument('-f', '--out_format', choices=['png', 'gif', 'jpeg', 'ppm', 'tiff'], default='png',
                         help='output format in which to render (default: png)')
     parser.add_argument('-t', '--top-margin', metavar='margin', default=0., type=float,
                         help='top margin (ignored area) end in percent of page height (default 0.0)')
@@ -499,40 +533,7 @@ def main():
                         help='bottom margin (ignored area) begin in percent of page height (default 100.0)')
     parser.add_argument('-r', '--result-width', default=900, type=int,
                         help='width of the result image (width of image in px)')
+    parser.set_defaults(method=main)
+
     args = parser.parse_args()
-
-    def invalid_usage(msg):
-        sys.stderr.write('ERROR: %s%s' % (msg, os.linesep))
-        parser.print_usage(sys.stderr)
-        sys.exit(1)
-
-    # Validate style
-    style = args.style.split(',')
-    if len(style) != 2:
-        invalid_usage('Exactly two style values must be specified, if --style is used.')
-    for i in [0, 1]:
-        if style[i] != 'box' and style[i] != 'strike' and style[i] != 'underline':
-            invalid_usage('--style values must be box, strike or underline, not "%s".' % (style[i]))
-
-    # Ensure one of files or --changes are specified
-    if len(args.files) == 0 and not args.changes:
-        invalid_usage('Please specify files to compare, or use --changes option.')
-
-    if args.changes:
-        # to just do the rendering part
-        img = render_changes(json.load(sys.stdin), style, args.result_width)
-        img.save(sys.stdout.buffer, args.format.upper())
-        sys.exit(0)
-
-    # Ensure enough file are specified
-    if len(args.files) != 2:
-        invalid_usage('Insufficient number of files to compare; please supply exactly 2.')
-
-    changes = compute_changes(args.files[0], args.files[1], top_margin=float(args.top_margin),
-                              bottom_margin=float(args.bottom_margin))
-    img = render_changes(changes, style, args.result_width)
-    img.save(sys.stdout.buffer, args.format.upper())
-
-
-if __name__ == "__main__":
-    main()
+    args.method(**vars(args))

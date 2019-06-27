@@ -1,1 +1,1 @@
-from .command_line import main
+from .command_line import main, NoDifferenceError

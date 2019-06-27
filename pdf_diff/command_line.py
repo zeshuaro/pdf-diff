@@ -134,7 +134,6 @@ def perform_diff(doc1text, doc2text):
     return dmp.diff_main(doc1text, doc2text)
 
 
-
 def process_hunks(hunks, boxes):
     # Process each diff hunk one by one and look at their corresponding
     # text boxes in the original PDFs.

@@ -11,7 +11,7 @@ setup(name='pdf-diff',
       license='CC0 1.0 Universal',
       packages=find_packages(),
       install_requires=[
-          'diff_match_patch_python',
+          'diff_match_patch',
           'lxml',
           'pillow',
       ],
